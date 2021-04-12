@@ -3,7 +3,7 @@ using namespace std;
 #define X first
 #define Y second
 int dx[4] = { 1,0,-1,0 };
-int dy[4] = { 0,1,0,-1 }; // »óÇÏÁÂ¿ì ³× ¹æÇâÀ» ÀÇ¹Ì
+int dy[4] = { 0,1,0,-1 }; // Â»Ã³Ã‡ÃÃÃ‚Â¿Ã¬ Â³Ã— Â¹Ã¦Ã‡Ã¢Ã€Â» Ã€Ã‡Â¹ÃŒ
 int N;
 int board[102][102];
 bool temp[102][102];
@@ -68,3 +68,4 @@ int main(void) {
 	cout << Max;
 	return 0;
 }
+
