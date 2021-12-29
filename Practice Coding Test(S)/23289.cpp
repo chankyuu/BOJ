@@ -25,16 +25,27 @@ bool checkPlace() {
 	}
 	return true;
 }
-// 1. ø¬«≥±‚ πŸ∂˜ ≥™ø»
+void setBoard() {
+	for (int i = 0; i < R; i++) {
+		if (i == 0) {
+			for (int j = 0; j < C; j++) sum[i][j] -= 1;
+		}
+		if (i == R - 1) {
+			for (int j = 0; j < C; j++) sum[i][j] -= 1;
+		}
+		if(sum[i][0] > 0) sum[i][0] -= 1;
+		if (sum[i][C - 1] > 0) sum[i][C - 1] -= 1;
+	}
+}
+// 1. Ïò®ÌíçÍ∏∞ Î∞îÎûå ÎÇòÏò¥
+
 void heat() {
 	queue<pair<int, int>> Q;
 
-	for (int i = 0; i < R; i++) fill(check[i], check[i] + C, 0);
-
 	for (int s = 0; s < heater.size(); s++) {
 		auto c = heater[s];
-
-		// 1:ø¿∏•¬ , 2:øﬁ¬ . 3:¿ß¬ , 4:æ∆∑°¬ 
+		for (int i = 0; i < R; i++) fill(check[i], check[i] + C, 0);
+		// 1:Ïò§Î•∏Ï™Ω, 2:ÏôºÏ™Ω. 3:ÏúÑÏ™Ω, 4:ÏïÑÎûòÏ™Ω
 		switch (board[c.X][c.Y]) {
 		case 1 :
 			Q.push({ c.X, c.Y + 1 });
@@ -121,7 +132,7 @@ void heat() {
 			}
 			break;
 		case 4 :
-			Q.push({ c.X - 1, c.Y });
+			Q.push({ c.X + 1, c.Y });
 			check[c.X + 1][c.Y] = 5;
 
 			while (!Q.empty()) {
@@ -154,7 +165,7 @@ void heat() {
 		for (int i = 0; i < R; i++) for (int j = 0; j < C; j++) sum[i][j] += check[i][j];
 	}
 }
-// 2. ø¬µµ ¡∂¿˝
+// 2. Ïò®ÎèÑ Ï°∞Ï†à
 void controlTemp() {
 	int tmp[22][22];
 	int dif = 0;
@@ -170,22 +181,19 @@ void controlTemp() {
 
 					if (nx < 0 || nx >= R || ny < 0 || ny >= C) continue;
 					if (wall[i][j] && wall[nx][ny]) continue;
+					if (sum[i][j] <= sum[nx][ny]) continue;
 
-					if (sum[i][j] > sum[nx][ny]) {
-						dif = (sum[i][j] - sum[nx][ny]) / 4;
-						tmp[i][j] -= dif;
-						tmp[i][j] += dif;
-					}
-					else {
-						dif = (sum[nx][ny] - sum[i][j]) / 4;
-						tmp[i][j] += dif;
-						tmp[i][j] -= dif;
-					}
+					dif = (sum[i][j] - sum[nx][ny]) / 4;
+
+					if (dif < 1) continue;
+
+					tmp[i][j] -= dif;
+					tmp[nx][ny] += dif;
 				}
 			}
 		}
 	}
-	for (int i = 0; i < R; i++) for (int j = 0; j < C; j++) sum[i][j] += tmp[i][j];
+	for (int i = 0; i < R; i++) for (int j = 0; j < C; j++) sum[i][j] = tmp[i][j];
 }
 int main() {
 	ios::sync_with_stdio(0);
@@ -207,20 +215,21 @@ int main() {
 	while (W--) {
 		cin >> x >> y >> t;
 		if (t == 0) {
-			wall[x][y] = 1;
-			wall[x - 1][y] = 1;
+			wall[x - 1][y - 1] = 1;
+			wall[x - 2][y - 1] = 1;
 		}
 		else {
-			wall[x][y] = 1;
-			wall[x][y + 1] = 1;
+			wall[x - 1][y - 1] = 1;
+			wall[x - 1][y] = 1;
 		}
 	}
 
 	while (true) {
 		heat();
 		controlTemp();
+		setBoard();
 		cnt++;
-		if (checkPlace) break;
+		if (checkPlace()) break;
 	}
 
 	cout << cnt;
