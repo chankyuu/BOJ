@@ -8,6 +8,7 @@ using namespace std;
 
 int dx[4] = { -1, 1, 0, 0 };
 int dy[4] = { 0, 0, -1, 1 };
+int td[4] = { 2, 1, 3, 0 };
 
 int N, M;
 int board[52][52];
@@ -15,7 +16,7 @@ int b1 = 0;
 int b2 = 0;
 int b3 = 0;
 
-// ¾óÀ½ ÆÄÆí ´øÁö±â(d = ¹æÇâ, s = °Å¸®)
+// ì–¼ìŒ íŒŒí¸ ë˜ì§€ê¸°(d = ë°©í–¥, s = ê±°ë¦¬)
 void snowBall(int d, int s) {
 	int t = 1;
 	pair<int, int> cur = { N / 2, N / 2 };
@@ -28,150 +29,74 @@ void snowBall(int d, int s) {
 		if (t > s) break;
 	}
 }
-// ±¸½½ ¿òÁ÷ÀÌ±â
-void moveMarble(pair<int, int> cur, int count, int dis, int n, int d) {
+// êµ¬ìŠ¬ ì›€ì§ì´ê¸°
+void moveMarble() {
+	queue<int> q;
+	pair<int, int> cur = { N / 2, N / 2 };
 	bool isEnd = false;
-	int s = dis;
-	int dir = d;
-	
-	for (int i = n; i < 2; i++) {
-		for (int j = count; j < s; j++) {
-			int nx = cur.X + dx[dir];
-			int ny = cur.Y + dy[dir];
+	int s = 1;
+	int dir = 0;
 
-			board[cur.X][cur.Y] = board[nx][ny];
-
-			cur.X = nx;
-			cur.Y = ny;
-			if (nx == 0 && ny == 0) {
-				board[nx][ny] = 0;
-				return;
-			}
-		}
-		count = 0;
-		switch (dir) {
-		case 0:
-			dir = 2;
-			break;
-		case 1:
-			dir = 3;
-			break;
-		case 2:
-			dir = 1;
-			break;
-		case 3:
-			dir = 0;
-			break;
-		}
-	}
-	s++;
-	
-	//	moveMarble({ cur.X, cur.Y }, j + 1, s, i, dir)
-	// ±¸½½Àº ÀÎµ¦½º 0, 2, 1, 3 ¼øÀ¸·Î ¿òÁ÷ÀÓ
 	while (true) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < s; j++) {
-				int nx = cur.X + dx[dir];
-				int ny = cur.Y + dy[dir];
+				int nx = cur.X + dx[td[dir]];
+				int ny = cur.Y + dy[td[dir]];
+				if (board[nx][ny] && board[nx][ny] != -1) q.push(board[nx][ny]);
+			
+				cur.X = nx;
+				cur.Y = ny;
+				if (nx == 0 && ny == 0) {
+					isEnd = true;
+					break;
+				}
+			}
+			dir = (dir + 1) % 4;
+			if (isEnd) break;
+		}
+		s++;
+		if (isEnd) break;
+	}
 
-				board[cur.X][cur.Y] = board[nx][ny];
+	for(int i = 0; i < N; i++) fill(board[i], board[i] + N, 0);
+	board[N / 2][N / 2] = -1;
+	if (q.empty()) return;
+	cur.X = N / 2, cur.Y = N / 2;
+	dir = 0;
+	s = 1;
+	isEnd = false;
+
+	while (true) {
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < s; j++) {
+				int nx = cur.X + dx[td[dir]];
+				int ny = cur.Y + dy[td[dir]];
+				board[nx][ny] = q.front();
+				q.pop();
+				if (q.empty()) return;
 
 				cur.X = nx;
 				cur.Y = ny;
 
 				if (nx == 0 && ny == 0) {
-					board[nx][ny] = 0;
 					isEnd = true;
 					break;
 				}
 			}
+			dir = (dir + 1) % 4;
 			if (isEnd) break;
-
-			switch (dir) {
-			case 0:
-				dir = 2;
-				break;
-			case 1:
-				dir = 3;
-				break;
-			case 2:
-				dir = 1;
-				break;
-			case 3:
-				dir = 0;
-				break;
-			}
-		}
-		s++;
-
-		if (isEnd) break;
-	}
-}
-// ±¸½½ Ã¼Å©
-void checkMarble() {
-	pair<int, int> cur = { N / 2, N / 2 };
-	bool isEnd = false;
-	int s = 1;
-	int dir = 2;
-	// ÀÎµ¦½º Ã¼Å©´Â 2, 1, 3, 0 ¼øÀ¸·Î
-	while (true) {
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < s; j++) {
-				cur.X += dx[dir];
-				cur.Y += dy[dir];
-				
-				if (cur.X == 0 && cur.Y == 0) {
-					isEnd = true;
-					break;
-				}
-				if (board[cur.X][cur.Y] != 0) continue;
-
-				while (board[cur.X][cur.Y] == 0) {
-					int board_t[52][52];
-					bool flag = false;
-					for (int i = 0; i < N; i++) for (int j = 0; j < N; j++) board_t[i][j] = board[i][j];
-
-					moveMarble({ cur.X, cur.Y }, j + 1, s, i, dir);
-
-					for (int i = 0; i < N; i++) {
-						for (int j = 0; j < N; j++) {
-							if (board[i][j] != board_t[i][j]) {
-								flag = true;
-								break;
-							}
-						}
-						if (flag) break;
-					}
-					if (!flag) break;
-				}
-			}
-			if (isEnd) break;
-
-			switch (dir) {
-			case 0:
-				dir = 2;
-				break;
-			case 1:
-				dir = 3;
-				break;
-			case 2:
-				dir = 1;
-				break;
-			case 3:
-				dir = 0;
-				break;
-			}
 		}
 		s++;
 		if (isEnd) break;
 	}
 }
-// ±¸½½ Æø¹ß
+// êµ¬ìŠ¬ í­ë°œ
 bool explosionMarble() {
 	pair<int, int> cur = { N / 2, N / 2 };
+	queue<pair<int, int>> q;
 	bool isEnd = false;
 	int s = 1;
-	int dir = 2;
+	int dir = 0;
 	int cnt = 0;
 	bool flag = true;
 	vector<pair<int, int>> sameR;
@@ -179,56 +104,37 @@ bool explosionMarble() {
 	while (true) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < s; j++) {
-				int nx = cur.X + dx[dir];
-				int ny = cur.Y + dy[dir];
+				int nx = cur.X + dx[td[dir]];
+				int ny = cur.Y + dy[td[dir]];
 
+				if (board[nx][ny] == board[cur.X][cur.Y]) q.push({ nx, ny });
+				else {
+					if (q.size() >= 4) {
+						while (!q.empty()) {
+							auto k = q.front();
+							q.pop();
+							
+							if (board[k.X][k.Y] == 1) b1 += (cnt + 1);
+							else if (board[k.X][k.Y] == 2) b2 += (cnt + 1);
+							else if (board[k.X][k.Y] == 3) b3 += (cnt + 1);
+							board[k.X][k.Y] = 0;
+						}
+						flag = false;
+					}
+					else {
+						while (!q.empty()) q.pop();
+					}
+					q.push({ nx, ny });
+				}
 				if (nx == 0 && ny == 0) {
 					isEnd = true;
 					break;
-				}
-				if (board[nx][ny] == 0) {
-					cur.X = nx;
-					cur.Y = ny;
-					continue;
-				}
-				if (board[nx][ny] == board[cur.X][cur.Y]) {
-					cnt++;
-					sameR.push_back({ cur.X, cur.Y });
-				}
-				else {
-					if (cnt >= 3) {
-						for (auto t : sameR) {
-							board[t.X][t.Y] = 0;
-						}
-						if (board[cur.X][cur.Y] == 1) b1 += (cnt + 1);
-						else if (board[cur.X][cur.Y] == 2) b2 += (cnt + 1);
-						else b3 += (cnt + 1);
-
-						board[cur.X][cur.Y] = 0;
-						flag = false;
-					}
-					cnt = 0;
-					sameR.clear();
 				}
 				cur.X = nx;
 				cur.Y = ny;
 			}
 			if (isEnd) break;
-
-			switch (dir) {
-			case 0:
-				dir = 2;
-				break;
-			case 1:
-				dir = 3;
-				break;
-			case 2:
-				dir = 1;
-				break;
-			case 3:
-				dir = 0;
-				break;
-			}
+			dir = (dir + 1) % 4;
 		}
 		s++;
 
@@ -236,20 +142,20 @@ bool explosionMarble() {
 	}
 	return flag;
 }
-// ¸¶Áö¸· º¸µå º¯ÇÏ±â
+// ë§ˆì§€ë§‰ ë³´ë“œ ë³€í•˜ê¸°
 void changeBoard() {
 	pair<int, int> cur = { N / 2 , N / 2 };
 	bool isEnd = false;
 	int s = 1;
-	int dir = 2;
+	int dir = 0;
 	int cnt = 1;
 	queue<pair<int, int>> sameR;
 
 	while (true) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < s; j++) {
-				int nx = cur.X + dx[dir];
-				int ny = cur.Y + dy[dir];
+				int nx = cur.X + dx[td[dir]];
+				int ny = cur.Y + dy[td[dir]];
 
 				if (board[cur.X][cur.Y] == 0) {
 					isEnd = true;
@@ -271,40 +177,30 @@ void changeBoard() {
 				cur.Y = ny;
 			}
 			if (isEnd) break;
-
-			switch (dir) {
-			case 0:
-				dir = 2;
-				break;
-			case 1:
-				dir = 3;
-				break;
-			case 2:
-				dir = 1;
-				break;
-			case 3:
-				dir = 0;
-				break;
-			}
+			dir = (dir + 1) % 4;
 		}
 		s++;
 
 		if (isEnd) break;
 	}
-	for (int i = 0; i < 52; i++) fill(board[i], board[i] + 52, 0);
+	for (int i = 0; i < N; i++) fill(board[i], board[i] + N, 0);
 	board[N / 2][N / 2] = -1;
+
+	if (sameR.empty()) {
+		return;
+	}
 
 	isEnd = false;
 	s = 1;
-	dir = 2;
+	dir = 0;
 	cur.X = N / 2;
 	cur.Y = N / 2;
 	int tmp = 0;
 	while (true) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < s; j++) {
-				int nx = cur.X + dx[dir];
-				int ny = cur.Y + dy[dir];
+				int nx = cur.X + dx[td[dir]];
+				int ny = cur.Y + dy[td[dir]];
 
 				if (cur.X == 0 && cur.Y == 0) {
 					isEnd = true;
@@ -322,7 +218,7 @@ void changeBoard() {
 					cur.Y = ny;
 					continue;
 				}
-				if (sameR.size() == 0) {
+				if (sameR.empty()) {
 					isEnd = true;
 					break;
 				}
@@ -334,21 +230,7 @@ void changeBoard() {
 				cur.Y = ny;
 			}
 			if (isEnd) break;
-
-			switch (dir) {
-			case 0:
-				dir = 2;
-				break;
-			case 1:
-				dir = 3;
-				break;
-			case 2:
-				dir = 1;
-				break;
-			case 3:
-				dir = 0;
-				break;
-			}
+			dir = (dir + 1) % 4;
 		}
 		s++;
 
@@ -372,19 +254,16 @@ int main() {
 
 	while (M--) {
 		int d, s;
-		int stop = false;
 		cin >> d >> s;
 
 		snowBall(d - 1, s);
-		while (!stop) {
-			checkMarble();
-			stop = explosionMarble();
-		}
+		do {
+			moveMarble();
+		} while (!explosionMarble());
+
 		changeBoard();
-
-		cout << board[N / 2][N / 2];
 	}
-
-	cout << 1 * b1 + 2 * b2 + 3 * b3;
+	board[N / 2][N / 2] = -1;
+	cout << (1 * b1) + (2 * b2) + (3 * b3);
 	return 0;
 }
