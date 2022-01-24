@@ -18,36 +18,36 @@ struct shark {
 
 shark board[22][22];
 shark t_board[22][22];
-int sharkP[405][4][4];
+vector<int> sharkP[405][4];
 
-// ¹æÇâ ¹Ù²Ù±â
+// ë°©í–¥ ë°”ê¾¸ê¸°
 int changeDir(int x, int y, int n, int d, int cnt) {
-	// ºóÄ­ÀÌ ¾øÀ¸¸é
+	// ë¹ˆì¹¸ì´ ì—†ìœ¼ë©´
 	if (cnt == 4) {
 		for (int i = 0; i < 4; i++) {
-			int tmp = sharkP[board[x][y].num][board[x][y].dir][i];
+			int tmp = sharkP[n][d][i];
 			int nx = x + dx[tmp];
 			int ny = y + dy[tmp];
 
-			if (nx < 0 || nx >= 4 || ny < 0 || ny >= 4) continue;
-			if (board[nx][ny].num == board[x][y].num) return tmp;
+			if (nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
+			if (t_board[nx][ny].num == n) return tmp;
 		}
 	}
 
 	int dir;
-	
+
 	dir = sharkP[n][d][cnt];
 
 	int nx = x + dx[dir];
 	int ny = y + dy[dir];
-	
+
 
 	if (nx < 0 || nx >= N || ny < 0 || ny >= N || t_board[nx][ny].smell != 0) {
 		return changeDir(x, y, n, d, cnt + 1);
 	}
 	else	return dir;
 }
-// ³¿»õ Á¦°Å
+// ëƒ„ìƒˆ ì œê±°
 void removeSmell() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
@@ -59,18 +59,16 @@ void removeSmell() {
 		}
 	}
 }
-// »ó¾î ÀÌµ¿
+// ìƒì–´ ì´ë™
 void moveShark() {
 	for (int i = 0; i < N; i++) for (int j = 0; j < N; j++) t_board[i][j] = board[i][j];
 
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			if (t_board[i][j].num == 0 || t_board[i][j].dir == -1) continue;
-			int dir = board[i][j].dir;
+			int dir = t_board[i][j].dir;
 
-			dir = changeDir(i, j, board[i][j].num, dir, 0);
-			
-			board[i][j].dir = dir;
+			dir = changeDir(i, j, t_board[i][j].num, dir, 0);
 
 			int nx = i + dx[dir];
 			int ny = j + dy[dir];
@@ -79,7 +77,7 @@ void moveShark() {
 				if (board[nx][ny].num > board[i][j].num) {
 					board[nx][ny].num = board[i][j].num;
 					board[nx][ny].smell = K;
-					board[nx][ny].dir = board[i][j].dir;
+					board[nx][ny].dir = dir;
 				}
 				board[i][j].dir = -1;
 				continue;
@@ -87,15 +85,16 @@ void moveShark() {
 
 			board[nx][ny].num = board[i][j].num;
 			board[nx][ny].smell = K;
-			board[nx][ny].dir = board[i][j].dir;
+			board[nx][ny].dir = dir;
 			board[i][j].dir = -1;
 		}
 	}
 }
-// ÇØ´ä Ã¼Å©
+// í•´ë‹µ ì²´í¬
 bool check() {
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
+
 			if (board[i][j].num >= 2 && board[i][j].dir != -1) return false;
 		}
 	}
@@ -106,17 +105,17 @@ int main() {
 	cin.tie(0);
 
 	int result = 0;
-	int tmp[22];
+	int tmp[405];
 
 	cin >> N >> M >> K;
 
-	for (int i = 0; i < N; i++) 
+	for (int i = 0; i < N; i++)
 		for (int j = 0; j < N; j++) {
 			int n;
 			cin >> n;
 			board[i][j].num = n;
 			if (n != 0) board[i][j].smell = K;
-	}
+		}
 
 	for (int i = 0; i < M; i++) {
 		cin >> tmp[i];
@@ -135,7 +134,7 @@ int main() {
 			for (int k = 0; k < 4; k++) {
 				int d;
 				cin >> d;
-				sharkP[i][j][k] = d - 1;
+				sharkP[i][j].push_back(d - 1);
 			}
 		}
 	}
@@ -145,7 +144,7 @@ int main() {
 		removeSmell();
 		result++;
 
-		if (result >= 1000) {
+		if (result > 1000) {
 			result = -1;
 			break;
 		}
