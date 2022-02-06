@@ -6,7 +6,7 @@ int N, M, H;
 bool board[32][12];
 int result = 0x7f7f7f7f;
 
-// »ç´Ù¸® Å¸±â
+// Â»Ã§Â´Ã™Â¸Â® Ã…Â¸Â±Ã¢
 bool sadari() {
 	for (int i = 1; i <= N; i++) {
 		int cur = i;
@@ -18,7 +18,7 @@ bool sadari() {
 	}
 	return true;
 }
-// »ç´Ù¸® Á¶ÀÛ
+// Â»Ã§Â´Ã™Â¸Â® ÃÂ¶Ã€Ã›
 void control(int idx, int cnt) {
 	if (cnt > 3) {
 		return;
