@@ -14,7 +14,7 @@ int dy[4] = { -1, 1, 0, 0 };
 pair<int, int> R, B;
 // 최소 값 찾기
 void back(int Rx, int Ry, int Bx, int By, int cnt, int D) {
-	if (cnt > 11) return;
+	if (cnt > 10) return;
 	if (cnt >= result) return;
 
 	bool Rflag = false;
