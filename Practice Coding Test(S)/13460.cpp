@@ -12,14 +12,14 @@ int dx[4] = { 0, 0, -1, 1 };
 int dy[4] = { -1, 1, 0, 0 };
 
 pair<int, int> R, B;
-// ÃÖ¼Ò °ª Ã£±â
+// ìµœì†Œ ê°’ ì°¾ê¸°
 void back(int Rx, int Ry, int Bx, int By, int cnt, int D) {
 	if (cnt > 11) return;
 	if (cnt >= result) return;
 
 	bool Rflag = false;
 	bool Bflag = false;
-	// ¼ø¼­´ë·Î ¿Ş, ¿À, À§, ¾Æ·¡·Î ±â¿ïÀÌ±â
+	// ìˆœì„œëŒ€ë¡œ ì™¼, ì˜¤, ìœ„, ì•„ë˜ë¡œ ê¸°ìš¸ì´ê¸°
 	int nxR = Rx + dx[D];
 	int nyR = Ry + dy[D];
 
