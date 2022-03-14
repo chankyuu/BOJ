@@ -24,6 +24,7 @@ int main() {
 				cout << "NOISE";
 				return 0;
 			}
+			i++
 			while (i < tmp.size() && tmp[i] == '1') {
 				if (i + 2 < tmp.size() && tmp[i + 1] == '0' && tmp[i + 2] == '0') break;
 				i++;
@@ -40,7 +41,7 @@ int main() {
 	cout << "SUBMARINE";
 	return 0;
 }
-// Á¤±ÔÇ¥Çö½Ä »ç¿ë
+// ÃÂ¤Â±Ã”Ã‡Â¥Ã‡Ã¶Â½Ã„ Â»Ã§Â¿Ã«
 //#include <iostream>
 //#include <string>
 //#include <regex>
